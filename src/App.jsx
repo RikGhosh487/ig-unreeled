@@ -16,23 +16,67 @@ export default function App() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState("");
   const [variant] = useState("compact"); // "compact" or "story"
+  const [processing, setProcessing] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
+  const onProgress = (message) => {
+    // Could be used to show progress messages to user
+    console.log("Progress:", message);
+  };
 
   const onSuccess = (data) => {
+    setProcessing(false);
+    setUploadedFiles([]);
+
+    // Check if this is raw Instagram data that needs processing
+    if (data.type === "raw_instagram") {
+      setError(
+        "Raw Instagram processing not yet implemented. " +
+          "Please upload a processed stats JSON file for now."
+      );
+      return;
+    }
+
+    // Handle processed stats data
     setStats(data);
     setError("");
   };
 
   const onError = (errorMessage) => {
+    setProcessing(false);
+    setUploadedFiles([]);
     setError(errorMessage);
+  };
+
+  const handleFileUploadWrapper = (event) => {
+    setProcessing(true);
+    setError("");
+
+    const files = Array.from(event.target.files);
+    setUploadedFiles(files.map((f) => f.name));
+
+    handleFileUpload(event, onSuccess, onError, onProgress);
+  };
+
+  const handleFileDropWrapper = (event) => {
+    setProcessing(true);
+    setError("");
+
+    const files = Array.from(event.dataTransfer.files);
+    setUploadedFiles(files.map((f) => f.name));
+
+    handleFileDrop(event, onSuccess, onError, onProgress);
   };
 
   if (!stats) {
     return (
       <FileUpload
-        onFileUpload={(event) => handleFileUpload(event, onSuccess, onError)}
+        onFileUpload={handleFileUploadWrapper}
         error={error}
-        onDrop={(event) => handleFileDrop(event, onSuccess, onError)}
+        onDrop={handleFileDropWrapper}
         onDragOver={handleDragOver}
+        processing={processing}
+        uploadedFiles={uploadedFiles}
       />
     );
   }
@@ -62,7 +106,12 @@ export default function App() {
 
           <div className="flex items-center justify-center gap-4 mb-4">
             <button
-              onClick={() => setStats(null)}
+              onClick={() => {
+                setStats(null);
+                setError("");
+                setUploadedFiles([]);
+                setProcessing(false);
+              }}
               className={
                 "px-4 py-2 rounded-lg text-sm bg-white/10 " +
                 "text-slate-400 hover:text-white transition-colors"

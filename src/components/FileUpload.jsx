@@ -1,6 +1,13 @@
-import { Upload } from "lucide-react";
+import { Upload, FileText } from "lucide-react";
 
-function FileUpload({ onFileUpload, error, onDrop, onDragOver }) {
+function FileUpload({
+  onFileUpload,
+  error,
+  onDrop,
+  onDragOver,
+  processing = false,
+  uploadedFiles = [],
+}) {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
@@ -9,40 +16,92 @@ function FileUpload({ onFileUpload, error, onDrop, onDragOver }) {
             Instagram Rewind Cards
           </h2>
           <p className="opacity-80">
-            Upload your stats JSON to generate beautiful cards
+            Upload your Instagram message files or processed stats JSON
           </p>
         </div>
 
         <div
           className={
             "border-2 border-dashed border-slate-600 rounded-xl p-12 " +
-            "text-center bg-slate-900/50 backdrop-blur-sm"
+            "text-center bg-slate-900/50 backdrop-blur-sm " +
+            "transition-colors " +
+            (processing ? "border-blue-500/50 bg-blue-950/20" : "")
           }
           onDrop={onDrop}
           onDragOver={onDragOver}
         >
-          <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <input
-            type="file"
-            accept=".json"
-            onChange={onFileUpload}
-            className="hidden"
-            id="file-input"
+          <Upload
+            className={`w-12 h-12 mx-auto mb-4 ${
+              processing ? "text-blue-400 animate-pulse" : "text-slate-400"
+            }`}
           />
-          <label
-            htmlFor="file-input"
-            className={
-              "inline-flex items-center gap-2 px-6 py-3 " +
-              "bg-white/10 hover:bg-white/20 rounded-lg text-white " +
-              "cursor-pointer transition-colors"
-            }
-          >
-            Upload Stats JSON
-          </label>
-          <p className="text-slate-400 mt-4 text-sm">
-            Or drag and drop your JSON file here
-          </p>
+
+          {!processing && (
+            <>
+              <input
+                type="file"
+                accept=".json"
+                multiple
+                onChange={onFileUpload}
+                className="hidden"
+                id="file-input"
+              />
+              <label
+                htmlFor="file-input"
+                className={
+                  "inline-flex items-center gap-2 px-6 py-3 " +
+                  "bg-white/10 hover:bg-white/20 rounded-lg text-white " +
+                  "cursor-pointer transition-colors"
+                }
+              >
+                Upload JSON Files
+              </label>
+              <p className="text-slate-400 mt-4 text-sm">
+                Select multiple message_X.json files from Instagram export
+                <br />
+                or a single processed stats JSON file
+              </p>
+            </>
+          )}
+
+          {processing && (
+            <div className="text-blue-400">
+              <p className="font-medium">Processing files...</p>
+              <p className="text-sm mt-2">Analyzing your Instagram data</p>
+            </div>
+          )}
+
+          {uploadedFiles.length > 0 && !processing && (
+            <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-white font-medium mb-3 text-sm">
+                Uploaded Files:
+              </h4>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {uploadedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-xs text-slate-300"
+                  >
+                    <FileText className="w-3 h-3" />
+                    <span className="truncate">{file}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {error && <p className="text-red-400 mt-4">{error}</p>}
+        </div>
+
+        <div className="mt-6 p-4 bg-slate-800/30 rounded-lg text-xs text-slate-400">
+          <p className="font-medium text-white mb-2">Supported formats:</p>
+          <ul className="space-y-1">
+            <li>
+              • Raw Instagram message files (message_1.json, message_2.json,
+              etc.)
+            </li>
+            <li>• Pre-processed stats JSON (from previous versions)</li>
+          </ul>
         </div>
       </div>
     </div>
