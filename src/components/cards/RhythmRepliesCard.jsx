@@ -71,7 +71,8 @@ function RhythmRepliesCard({ data, variant }) {
                     ? Math.round((rawActivityCount / maxActivity) * 100)
                     : 0;
                   
-                  const height = Math.max(10, activityPercentage); // minimum height 10%
+                  // minimum height 10%
+                  const height = Math.max(10, activityPercentage);
                   
                   return (
                     <div
@@ -79,7 +80,10 @@ function RhythmRepliesCard({ data, variant }) {
                       className={
                         "w-3 h-10 rounded bg-white/10 overflow-hidden"
                       }
-                      title={`${h}:00 - ${rawActivityCount} messages (${activityPercentage}% of peak)`}
+                      title={
+                        `${h}:00 - ${rawActivityCount} messages ` +
+                        `(${activityPercentage}% of peak)`
+                      }
                     >
                       <div
                         className="w-full rounded bg-white/70"

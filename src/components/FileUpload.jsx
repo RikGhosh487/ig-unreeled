@@ -11,7 +11,10 @@ function FileUpload({
   progressPercent = 0,
 }) {
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+    <div className={
+      "min-h-screen bg-slate-950 flex items-center " +
+      "justify-center p-6"
+    }>
       <div className="max-w-lg w-full">
         <div className="text-center text-slate-300 mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -74,7 +77,10 @@ function FileUpload({
               {progressPercent > 0 && (
                 <div className="w-full bg-slate-700 rounded-full h-2 mt-3 mb-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300 ease-out"
+                    className={
+                      "bg-blue-500 h-2 rounded-full transition-all " +
+                      "duration-300 ease-out"
+                    }
                     style={{ width: `${Math.min(progressPercent, 100)}%` }}
                   />
                 </div>
@@ -120,7 +126,10 @@ function FileUpload({
           {error && <p className="text-red-400 mt-4">{error}</p>}
         </div>
 
-        <div className="mt-6 p-4 bg-slate-800/30 rounded-lg text-xs text-slate-400">
+        <div className={
+          "mt-6 p-4 bg-slate-800/30 rounded-lg text-xs " +
+          "text-slate-400"
+        }>
           <p className="font-medium text-white mb-2">Supported formats:</p>
           <ul className="space-y-1">
             <li>

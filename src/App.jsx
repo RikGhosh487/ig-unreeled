@@ -33,7 +33,7 @@ export default function App() {
       if (e.key === "ArrowLeft") {
         setCurrentStoryIndex(prev => Math.max(0, prev - 1));
       } else if (e.key === "ArrowRight") {
-        setCurrentStoryIndex(prev => Math.min(3, prev + 1)); // 4 cards total (0-3)
+        setCurrentStoryIndex(prev => Math.min(3, prev + 1)); // 4 cards
       } else if (e.key === "Escape") {
         setIsStoriesMode(false);
       }
@@ -108,7 +108,10 @@ export default function App() {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `instagram-rewind-${stats.rewind_year || new Date().getFullYear()}-stats.json`;
+    const filename = `instagram-rewind-${
+      stats.rewind_year || new Date().getFullYear()
+    }-stats.json`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -147,7 +150,9 @@ export default function App() {
       <div className="max-w-2xl mx-auto grid grid-cols-1 gap-6">
         <div className="text-center text-white/90 mb-2">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            Instagram Rewind {stats.rewind_year || new Date().getFullYear()}
+            Instagram Rewind {
+              stats.rewind_year || new Date().getFullYear()
+            }
           </h2>
           <p className="opacity-80 text-sm mb-4">
             Shareable cards for your group chat rewind
@@ -193,13 +198,19 @@ export default function App() {
         </div>
         {isStoriesMode ? (
           // Stories Mode
-          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className={
+            "fixed inset-0 bg-black z-50 flex items-center " +
+            "justify-center"
+          }>
             {/* Progress bars */}
             <div className="absolute top-4 left-4 right-4 z-10 flex gap-1">
               {cards.map((_, index) => (
                 <div
                   key={index}
-                  className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden"
+                  className={
+                    "flex-1 h-1 bg-white/30 rounded-full " +
+                    "overflow-hidden"
+                  }
                 >
                   <div
                     className={`h-full bg-white transition-all duration-300 ${
@@ -220,10 +231,23 @@ export default function App() {
                 e.stopPropagation();
                 setIsStoriesMode(false);
               }}
-              className="absolute top-4 right-4 z-20 text-white hover:text-gray-300 transition-colors p-2"
+              className={
+                "absolute top-4 right-4 z-20 text-white " +
+                "hover:text-gray-300 transition-colors p-2"
+              }
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg 
+                className="w-6 h-6" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M6 18L18 6M6 6l12 12" 
+                />
               </svg>
             </button>
 
@@ -231,11 +255,17 @@ export default function App() {
             <div className="absolute inset-0 z-10 flex">
               <div
                 className="flex-1"
-                onClick={() => setCurrentStoryIndex(Math.max(0, currentStoryIndex - 1))}
+                onClick={() => 
+                  setCurrentStoryIndex(Math.max(0, currentStoryIndex - 1))
+                }
               />
               <div
                 className="flex-1"
-                onClick={() => setCurrentStoryIndex(Math.min(cards.length - 1, currentStoryIndex + 1))}
+                onClick={() => 
+                  setCurrentStoryIndex(
+                    Math.min(cards.length - 1, currentStoryIndex + 1)
+                  )
+                }
               />
             </div>
 

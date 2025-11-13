@@ -1,6 +1,6 @@
 // Instagram-specific data processing utilities
 
-// Helper function to decode Instagram's escaped UTF-8 emoji encoding
+// Helper function to decode Instagram"s escaped UTF-8 emoji encoding
 export const decodeInstagramEmoji = (escapedEmoji) => {
   try {
     // Instagram stores emojis as UTF-8 byte sequences
@@ -19,12 +19,12 @@ export const decodeInstagramEmoji = (escapedEmoji) => {
     
     // Try to decode as UTF-8
     try {
-      // If it's valid UTF-8, this should give us the proper emoji
+      // If it"s valid UTF-8, this should give us the proper emoji
       const bytes = new Uint8Array(result.length);
       for (let i = 0; i < result.length; i++) {
         bytes[i] = result.charCodeAt(i);
       }
-      result = new TextDecoder('utf-8').decode(bytes);
+      result = new TextDecoder("utf-8").decode(bytes);
     } catch (e) {
       // If UTF-8 decoding fails, just use the original
     }
@@ -39,11 +39,11 @@ export const decodeInstagramEmoji = (escapedEmoji) => {
 // Helper function to check if a domain should be excluded from top_domains
 export const isExternalDomain = (domain) => {
   const internalDomains = [
-    'instagram.com', 
-    'ig.me',
-    'facebook.com',
-    'fb.com',
-    'meta.com'
+    "instagram.com", 
+    "ig.me",
+    "facebook.com",
+    "fb.com",
+    "meta.com"
   ];
   return !internalDomains.some(internal => domain.includes(internal));
 };

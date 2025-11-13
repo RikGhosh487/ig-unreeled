@@ -1,5 +1,9 @@
 // Instagram message data processing module
-import { decodeInstagramEmoji, isExternalDomain, filterMessagesByYear } from './instagramUtils.js';
+import { 
+  decodeInstagramEmoji, 
+  isExternalDomain, 
+  filterMessagesByYear 
+} from "./instagramUtils.js";
 
 // Process raw Instagram message files into stats format
 export const processInstagramFiles = (instagramFiles, onProgress = null) => {
@@ -71,13 +75,19 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
 
   currentYearMessages.forEach((message, index) => {
     // Progress reporting for large datasets (every 10% of progress)
-    if (onProgress && totalMessages > 1000 && index % Math.floor(totalMessages / 10) === 0 && index > 0) {
-      const progressPercent = Math.round(50 + (index / totalMessages) * 30); // 50-80% range
-      onProgress(`Analyzing message ${index} of ${totalMessages}...`, progressPercent);
+    if (onProgress && totalMessages > 1000 && 
+        index % Math.floor(totalMessages / 10) === 0 && index > 0) {
+      // 50-80% range
+      const progressPercent = Math.round(50 + (index / totalMessages) * 30);
+      onProgress(
+        `Analyzing message ${index} of ${totalMessages}...`, 
+        progressPercent
+      );
     }
 
     const sender = message.sender_name;
-    if (!participants.includes(sender)) return; // Skip if sender not in participants
+    // Skip if sender not in participants
+    if (!participants.includes(sender)) return;
 
     // Count total messages
     stats.total_messages++;
@@ -86,7 +96,7 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     // Process timestamp
     const date = new Date(message.timestamp_ms);
     const hour = date.getHours();
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
 
     // Hourly activity
     stats.hourly_activity[hour]++;
@@ -104,13 +114,14 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
           
           // Count reaction emojis - decode the escaped emoji
           const emoji = decodeInstagramEmoji(reaction.reaction);
-          stats.top_reaction_emoji[emoji] = (stats.top_reaction_emoji[emoji] || 0) + 1;
+          stats.top_reaction_emoji[emoji] = 
+            (stats.top_reaction_emoji[emoji] || 0) + 1;
         }
       });
     }
 
     // Process message content for emojis
-    if (message.content && typeof message.content === 'string') {
+    if (message.content && typeof message.content === "string") {
       // First, decode any escaped emojis in the content
       const decodedContent = decodeInstagramEmoji(message.content);
       
@@ -129,9 +140,10 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
       if (escapedEmojis) {
         escapedEmojis.forEach(escapedEmoji => {
           const decodedEmoji = decodeInstagramEmoji(escapedEmoji);
-          // Check if it's actually an emoji after decoding
+          // Check if it"s actually an emoji after decoding
           if (emojiRegex.test(decodedEmoji)) {
-            stats.emoji_in_text[decodedEmoji] = (stats.emoji_in_text[decodedEmoji] || 0) + 1;
+            stats.emoji_in_text[decodedEmoji] = 
+              (stats.emoji_in_text[decodedEmoji] || 0) + 1;
           }
         });
       }
@@ -139,15 +151,15 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
 
     // Process shared links (for reels and domains)
     if (message.share && message.share.link) {
-      // Check if it's a reel
-      if (message.share.link.includes('/reel/')) {
+      // Check if it"s a reel
+      if (message.share.link.includes("/reel/")) {
         stats.reels_total++;
       }
 
       // Extract domain (only count external domains)
       try {
         const url = new URL(message.share.link);
-        const domain = url.hostname.replace('www.', '');
+        const domain = url.hostname.replace("www.", "");
         
         // Only count external domains (not Instagram/Meta properties)
         if (isExternalDomain(domain)) {
@@ -162,7 +174,9 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     if (index > 0) {
       const prevMessage = currentYearMessages[index - 1];
       if (prevMessage.sender_name !== sender) {
-        const timeDiff = (message.timestamp_ms - prevMessage.timestamp_ms) / (1000 * 60); // minutes
+        // minutes
+        const timeDiff = (message.timestamp_ms - prevMessage.timestamp_ms) / 
+          (1000 * 60);
         if (!replyTimes[sender]) replyTimes[sender] = [];
         if (timeDiff < 1440) { // Only count replies within 24 hours
           replyTimes[sender].push(timeDiff);
@@ -174,7 +188,7 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     if (index > 0) {
       const prevSender = currentYearMessages[index - 1].sender_name;
       if (prevSender !== sender) {
-        const duo = [prevSender, sender].sort().join('|');
+        const duo = [prevSender, sender].sort().join("|");
         duoCounts[duo] = (duoCounts[duo] || 0) + 1;
       }
     }
@@ -217,7 +231,9 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
   sortedDates.forEach(dateStr => {
     const currentDate = new Date(dateStr);
     if (lastDate) {
-      const dayDiff = Math.floor((currentDate - lastDate) / (1000 * 60 * 60 * 24));
+      const dayDiff = Math.floor(
+        (currentDate - lastDate) / (1000 * 60 * 60 * 24)
+      );
       if (dayDiff === 1) {
         currentStreak++;
       } else {
@@ -241,7 +257,7 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
   stats.best_duo = Object.entries(duoCounts)
     .sort(([,a], [,b]) => b - a)
     .slice(0, 1)
-    .map(([duo, count]) => [duo.split('|'), count]);
+    .map(([duo, count]) => [duo.split("|"), count]);
 
   // Calculate reply time medians (used in RhythmRepliesCard)
   Object.keys(replyTimes).forEach(sender => {

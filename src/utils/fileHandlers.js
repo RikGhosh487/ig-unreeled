@@ -3,9 +3,9 @@ import {
   isInstagramMessageFile, 
   isProcessedStatsFile, 
   validateSameConversation 
-} from './validation.js';
-import { processInstagramFiles } from './messageProcessor.js';
-import { readMultipleJsonFiles } from './fileReaders.js';
+} from "./validation.js";
+import { processInstagramFiles } from "./messageProcessor.js";
+import { readMultipleJsonFiles } from "./fileReaders.js";
 
 // Process multiple files
 export const parseMultipleFiles = async (
@@ -101,8 +101,9 @@ export const parseMultipleFiles = async (
         switch (validationResult.reason) {
           case "title_mismatch":
             errorMessage += 
-              `Chat titles don't match. Expected: "${validationResult.expected}" ` +
-              `but found: "${validationResult.found}" in file ` +
+              `Chat titles don't match. Expected: ` +
+              `"${validationResult.expected}" but found: ` +
+              `"${validationResult.found}" in file ` +
               `"${validationResult.file}". `;
             break;
           case "participant_count_mismatch":
@@ -132,7 +133,10 @@ export const parseMultipleFiles = async (
 
       try {
         // Process the raw Instagram files into stats format
-        const processedStats = processInstagramFiles(instagramFiles, onProgress);
+        const processedStats = processInstagramFiles(
+          instagramFiles, 
+          onProgress
+        );
         onProgress && onProgress("Finalizing data...", 100);
         onSuccess(processedStats);
       } catch (error) {

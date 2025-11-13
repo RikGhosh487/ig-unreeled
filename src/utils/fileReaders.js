@@ -14,7 +14,9 @@ export const readJsonFile = (file) => {
           size: file.size
         });
       } catch (error) {
-        reject(new Error(`Failed to parse JSON in file "${file.name}": ${error.message}`));
+        reject(new Error(
+          `Failed to parse JSON in file "${file.name}": ${error.message}`
+        ));
       }
     };
     
