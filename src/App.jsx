@@ -150,7 +150,7 @@ export default function App() {
               onClick={handleExportStats}
               className={
                 "px-4 py-2 rounded-lg text-sm bg-white/10 " +
-                "text-slate-400 hover:text-white transition-colors "
+                "text-slate-400 hover:text-white transition-colors"
               }
             >
               Export Stats JSON
