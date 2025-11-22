@@ -128,6 +128,14 @@ function RhythmCard({ data }) {
               <span className="text-white/50">•</span>
               <span className="text-white/50">{data.burstiness_coefficient.toFixed(2)}</span>
             </div>
+            {data.avg_messages_per_day !== undefined && (
+              <div className="mt-2 pt-2 border-t border-white/10 text-center">
+                <div className="text-xs text-white/50">avg messages per day</div>
+                <div className="text-lg font-semibold text-white mt-0.5">
+                  {data.avg_messages_per_day.toFixed(1)}
+                </div>
+              </div>
+            )}
           </div>
         )}
         

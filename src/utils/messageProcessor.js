@@ -420,8 +420,10 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     const variance = dailyCounts.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / dailyCounts.length;
     const stdDev = Math.sqrt(variance);
     stats.burstiness_coefficient = mean > 0 ? stdDev / mean : 0;
+    stats.avg_messages_per_day = mean;
   } else {
     stats.burstiness_coefficient = 0;
+    stats.avg_messages_per_day = dailyCounts.length > 0 ? dailyCounts[0] : 0;
   }
   
   // Add weekend vs weekday stats
