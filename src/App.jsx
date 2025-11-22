@@ -16,7 +16,6 @@ import {
 export default function App() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState("");
-  const [variant] = useState("compact"); // "compact" or "story"
   const [processing, setProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [progressMessage, setProgressMessage] = useState("");
@@ -135,11 +134,11 @@ export default function App() {
   }
 
   const cards = [
-    <OverviewCard key="ov" data={stats} variant={variant} />,
-    <TopChattersCard key="tc" data={stats} variant={variant} />,
-    <ReplyCard key="rc" data={stats} variant={variant} />,
-    <EngagementCard key="eg" data={stats} variant={variant} />,
-    <RhythmRepliesCard key="rr" data={stats} variant={variant} />,
+    <OverviewCard key="ov" data={stats} />,
+    <TopChattersCard key="tc" data={stats} />,
+    <ReplyCard key="rc" data={stats} />,
+    <EngagementCard key="eg" data={stats} />,
+    <RhythmRepliesCard key="rr" data={stats} />,
   ];
 
   return (

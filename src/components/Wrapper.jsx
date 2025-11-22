@@ -2,16 +2,14 @@ import { Download, Flame } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import html2canvas from "html2canvas";
 
-function Wrapper({ children, title, icon, variant = "compact", cardRef }) {
-  const isStory = variant === "story";
-
+function Wrapper({ children, title, icon, cardRef }) {
   const downloadCard = async () => {
     if (cardRef?.current) {
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
         backgroundColor: null,
-        width: isStory ? 1080 : 450,
-        height: isStory ? 1920 : 640,
+        width: 480,
+        height: 700,
       });
 
       const link = document.createElement("a");
@@ -26,11 +24,9 @@ function Wrapper({ children, title, icon, variant = "compact", cardRef }) {
     <Card
       ref={cardRef}
       className={
-        `relative w-full max-w-[480px] ${
-          isStory ? "h-[1920px]" : "min-h-[640px]"
-        } mx-auto overflow-hidden rounded-3xl border-0 ` +
-        "shadow-xl bg-gradient-to-br from-purple-900 via-pink-800 " +
-        "to-orange-700"
+        "relative w-full max-w-[480px] min-h-[700px] mx-auto " +
+        "overflow-hidden rounded-3xl border-0 shadow-xl " +
+        "bg-gradient-to-br from-purple-900 via-pink-800 to-orange-700"
       }
     >
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
@@ -47,12 +43,7 @@ function Wrapper({ children, title, icon, variant = "compact", cardRef }) {
           }
         />
       </div>
-      <div
-        className={
-          `flex ${isStory ? "h-full" : "h-full min-h-[640px]"} ` +
-          "flex-col p-8 md:p-10"
-        }
-      >
+      <div className="flex h-full min-h-[700px] flex-col p-8 md:p-10">
         <header className="mb-4">
           <div className="flex items-center gap-2">
             <div

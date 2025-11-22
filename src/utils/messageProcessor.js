@@ -60,7 +60,8 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     longest_streak_days: 0,
     reply_times_median: {},
     rewind_year: currentYear, // Add the year to the stats
-    chat_title: chatTitle // Add the chat title
+    chat_title: chatTitle, // Add the chat title
+    most_reacted_message: null // Track message with most reactions
   };
 
   // Initialize per-sender stats
@@ -114,6 +115,8 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
 
     // Process reactions received by this message
     if (message.reactions) {
+      const reactionCount = message.reactions.length;
+      
       message.reactions.forEach(reaction => {
         const reactor = reaction.actor;
         if (participants.includes(reactor)) {
@@ -126,6 +129,42 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
             (stats.top_reaction_emoji[emoji] || 0) + 1;
         }
       });
+      
+      // Track most-reacted message
+      // Filter out system messages (attachments, shared content, etc.)
+      const isSystemMessage = !message.content || 
+        message.content.includes(" sent an attachment") ||
+        message.content.includes(" shared a") ||
+        message.content.includes(" sent a photo") ||
+        message.content.includes(" sent a video") ||
+        message.content.includes(" sent a voice message") ||
+        message.content.includes(" liked a message") ||
+        message.content.includes(" reacted ") ||
+        message.share ||
+        message.photos ||
+        message.videos ||
+        message.audio_files;
+      
+      if (!isSystemMessage && message.content) {
+        const shouldUpdate = 
+          !stats.most_reacted_message ||
+          reactionCount > stats.most_reacted_message.reaction_count ||
+          // Break ties: prefer longer messages (more substance)
+          (reactionCount === stats.most_reacted_message.reaction_count && 
+           message.content.length > stats.most_reacted_message.content.length);
+        
+        if (shouldUpdate) {
+          // Decode Instagram's escaped characters
+          const decodedContent = decodeInstagramEmoji(message.content);
+          
+          stats.most_reacted_message = {
+            content: decodedContent,
+            sender: sender,
+            reaction_count: reactionCount,
+            timestamp: message.timestamp_ms
+          };
+        }
+      }
     }
 
     // Process message content for emojis

@@ -3,12 +3,12 @@ import { Heart, PlayCircle } from "lucide-react";
 import Wrapper from "../Wrapper";
 import Row from "../Row";
 
-function EngagementCard({ data, variant }) {
+function EngagementCard({ data }) {
   const cardRef = useRef(null);
   const topEmojis = data.top_reaction_emoji
     ? Object.entries(data.top_reaction_emoji)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
+        .slice(0, 3)
         .map(([emoji, count]) => ({ emoji, count }))
     : [];
 
@@ -29,7 +29,7 @@ function EngagementCard({ data, variant }) {
   const textEmojis = data.emoji_in_text
     ? Object.entries(data.emoji_in_text)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
+        .slice(0, 3)
         .map(([emoji, count]) => ({ emoji, count }))
     : [];
 
@@ -37,7 +37,6 @@ function EngagementCard({ data, variant }) {
     <Wrapper
       title="Engagement"
       icon={<Heart className="w-6 h-6 text-white" />}
-      variant={variant}
       cardRef={cardRef}
     >
       <div className="grid grid-cols-1 gap-4">

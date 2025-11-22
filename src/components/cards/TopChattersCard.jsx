@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Users } from "lucide-react";
 import Wrapper from "../Wrapper";
 
-function TopChattersCard({ data, variant }) {
+function TopChattersCard({ data }) {
   const cardRef = useRef(null);
   const topChatters = data.per_sender
     ? Object.entries(data.per_sender)
@@ -16,7 +16,6 @@ function TopChattersCard({ data, variant }) {
     <Wrapper
       title="Top Chatters"
       icon={<Users className="w-6 h-6 text-white" />}
-      variant={variant}
       cardRef={cardRef}
     >
       <ol className="mt-1 space-y-3">

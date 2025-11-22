@@ -3,7 +3,7 @@ import { MessageCircle, Timer, Users } from "lucide-react";
 import Wrapper from "../Wrapper";
 import Row from "../Row";
 
-function ReplyCard({ data, variant }) {
+function ReplyCard({ data }) {
   const cardRef = useRef(null);
   
   const formatTime = (minutes) => {
@@ -38,7 +38,6 @@ function ReplyCard({ data, variant }) {
     <Wrapper
       title="Replies"
       icon={<MessageCircle className="w-6 h-6 text-white" />}
-      variant={variant}
       cardRef={cardRef}
     >
       <div className="grid grid-cols-1 gap-4">
