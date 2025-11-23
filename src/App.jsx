@@ -6,6 +6,7 @@ import {
   EngagementCard,
   RhythmCard,
   ReplyCard,
+  PersonalCard,
 } from "./components/cards";
 import {
   handleFileUpload,
@@ -33,7 +34,7 @@ export default function App() {
       if (e.key === "ArrowLeft") {
         setCurrentStoryIndex(prev => Math.max(0, prev - 1));
       } else if (e.key === "ArrowRight") {
-        setCurrentStoryIndex(prev => Math.min(3, prev + 1)); // 4 cards
+        setCurrentStoryIndex(prev => Math.min(5, prev + 1)); // 6 cards
       } else if (e.key === "Escape") {
         setIsStoriesMode(false);
       }
@@ -135,6 +136,7 @@ export default function App() {
 
   const cards = [
     <OverviewCard key="ov" data={stats} isStoriesMode={isStoriesMode} />,
+    <PersonalCard key="pc" data={stats} isStoriesMode={isStoriesMode} />,
     <TopChattersCard key="tc" data={stats} isStoriesMode={isStoriesMode} />,
     <ReplyCard key="rc" data={stats} isStoriesMode={isStoriesMode} />,
     <EngagementCard key="eg" data={stats} isStoriesMode={isStoriesMode} />,

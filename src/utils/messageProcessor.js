@@ -43,6 +43,19 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     onProgress(`Processing ${currentYearMessages.length} messages...`, 50);
   }
 
+  // Identify account owner by looking for "You" in message content
+  let accountOwner = null;
+  for (const message of currentYearMessages) {
+    if (message.content && 
+        (message.content.startsWith("You sent an attachment") ||
+         message.content.startsWith("You shared") ||
+         message.content.startsWith("You sent a photo") ||
+         message.content.startsWith("You sent a video"))) {
+      accountOwner = message.sender_name;
+      break;
+    }
+  }
+
   // Initialize stats object with only fields used by cards
   const stats = {
     total_messages: 0,
@@ -77,7 +90,16 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
     reply_times_median: {},
     rewind_year: currentYear,
     chat_title: chatTitle,
-    most_reacted_message: null
+    most_reacted_message: null,
+    account_owner: accountOwner,
+    personal_stats: {
+      best_friend: null,
+      your_response_times: {},
+      your_active_hour: null,
+      your_most_received_emoji: null,
+      your_rank: null,
+      your_activity_level: null
+    }
   };
 
   // Initialize per-sender stats
@@ -99,6 +121,13 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
   const weeklyActivity = {}; // Week key -> message count
   let weekendMessages = 0;
   let weekdayMessages = 0;
+  
+  // Personal stats tracking
+  const yourHourlyActivity = new Array(24).fill(0);
+  const yourReplyTimes = {}; // per person
+  const reactionsWithEachPerson = {}; // track reactions between you and each person
+  const messagesWithEachPerson = {}; // track back-and-forth messages
+  const yourReceivedEmojiByActor = {}; // emoji -> { actor -> count }
   
   const totalMessages = currentYearMessages.length;
 
@@ -163,6 +192,11 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
 
     // Hourly activity
     stats.hourly_activity[hour]++;
+    
+    // Track personal hourly activity
+    if (accountOwner && sender === accountOwner) {
+      yourHourlyActivity[hour]++;
+    }
 
     // Daily activity for streaks
     dailyActivity[dateStr] = (dailyActivity[dateStr] || 0) + 1;
@@ -187,6 +221,28 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
           const emoji = decodeInstagramEmoji(reaction.reaction);
           stats.top_reaction_emoji[emoji] = 
             (stats.top_reaction_emoji[emoji] || 0) + 1;
+          
+          // Track personal reactions (for best friend calculation)
+          if (accountOwner) {
+            if (sender === accountOwner || reactor === accountOwner) {
+              const otherPerson = sender === accountOwner ? reactor : sender;
+              if (!reactionsWithEachPerson[otherPerson]) {
+                reactionsWithEachPerson[otherPerson] = 0;
+              }
+              reactionsWithEachPerson[otherPerson]++;
+            }
+            
+            // Track emojis received by you
+            if (sender === accountOwner) {
+              if (!yourReceivedEmojiByActor[emoji]) {
+                yourReceivedEmojiByActor[emoji] = {};
+              }
+              if (!yourReceivedEmojiByActor[emoji][reactor]) {
+                yourReceivedEmojiByActor[emoji][reactor] = 0;
+              }
+              yourReceivedEmojiByActor[emoji][reactor]++;
+            }
+          }
         }
       });
       
@@ -292,6 +348,26 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
         if (!replyTimes[sender]) replyTimes[sender] = [];
         if (timeDiff < 1440) { // Only count replies within 24 hours
           replyTimes[sender].push(timeDiff);
+        }
+        
+        // Track your personal reply times
+        if (accountOwner && sender === accountOwner) {
+          const respondingTo = prevMessage.sender_name;
+          if (!yourReplyTimes[respondingTo]) {
+            yourReplyTimes[respondingTo] = [];
+          }
+          if (timeDiff < 1440) {
+            yourReplyTimes[respondingTo].push(timeDiff);
+          }
+        }
+        
+        // Track back-and-forth messages (for best friend calculation)
+        if (accountOwner && (sender === accountOwner || prevMessage.sender_name === accountOwner)) {
+          const otherPerson = sender === accountOwner ? prevMessage.sender_name : sender;
+          if (!messagesWithEachPerson[otherPerson]) {
+            messagesWithEachPerson[otherPerson] = 0;
+          }
+          messagesWithEachPerson[otherPerson]++;
         }
       }
     }
@@ -429,6 +505,95 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
   // Add weekend vs weekday stats
   stats.weekend_messages = weekendMessages;
   stats.weekday_messages = weekdayMessages;
+  
+  // Calculate personal stats
+  if (accountOwner) {
+    // Best friend: weighted reactions*2 + back-and-forth messages
+    const friendScores = {};
+    participants.forEach(person => {
+      if (person !== accountOwner) {
+        const reactions = reactionsWithEachPerson[person] || 0;
+        const messages = messagesWithEachPerson[person] || 0;
+        friendScores[person] = reactions * 2 + messages;
+      }
+    });
+    
+    const bestFriendEntry = Object.entries(friendScores)
+      .sort(([,a], [,b]) => b - a)[0];
+    if (bestFriendEntry) {
+      stats.personal_stats.best_friend = {
+        name: bestFriendEntry[0],
+        score: bestFriendEntry[1]
+      };
+    }
+    
+    // Your response times (median per person)
+    const yourResponseTimes = {};
+    Object.keys(yourReplyTimes).forEach(person => {
+      const times = yourReplyTimes[person].sort((a, b) => a - b);
+      if (times.length > 0) {
+        const median = times.length % 2 === 0
+          ? (times[times.length / 2 - 1] + times[times.length / 2]) / 2
+          : times[Math.floor(times.length / 2)];
+        yourResponseTimes[person] = Math.round(median);
+      }
+    });
+    stats.personal_stats.your_response_times = yourResponseTimes;
+    
+    // Your busiest hour
+    const yourBusiestHour = yourHourlyActivity.indexOf(Math.max(...yourHourlyActivity));
+    stats.personal_stats.your_active_hour = yourBusiestHour;
+    
+    // Your most received emoji and top reactor
+    let mostReceivedEmoji = null;
+    let mostReceivedCount = 0;
+    let topReactor = null;
+    
+    Object.entries(yourReceivedEmojiByActor).forEach(([emoji, actors]) => {
+      const totalCount = Object.values(actors).reduce((sum, count) => sum + count, 0);
+      if (totalCount > mostReceivedCount) {
+        mostReceivedCount = totalCount;
+        mostReceivedEmoji = emoji;
+        // Find who reacted most with this emoji
+        const topActorEntry = Object.entries(actors)
+          .sort(([,a], [,b]) => b - a)[0];
+        topReactor = topActorEntry ? topActorEntry[0] : null;
+      }
+    });
+    
+    if (mostReceivedEmoji) {
+      stats.personal_stats.your_most_received_emoji = {
+        emoji: mostReceivedEmoji,
+        count: mostReceivedCount,
+        top_reactor: topReactor
+      };
+    }
+    
+    // Your rank and activity level
+    const sortedSenders = Object.entries(stats.per_sender)
+      .sort(([,a], [,b]) => b - a);
+    const yourRank = sortedSenders.findIndex(([name]) => name === accountOwner) + 1;
+    const yourMessageCount = stats.per_sender[accountOwner] || 0;
+    const totalMessages = stats.total_messages;
+    const yourPercentage = (yourMessageCount / totalMessages) * 100;
+    
+    stats.personal_stats.your_rank = yourRank;
+    stats.personal_stats.your_message_count = yourMessageCount;
+    stats.personal_stats.your_percentage = yourPercentage;
+    
+    // Activity level descriptor
+    if (yourPercentage > 40) {
+      stats.personal_stats.your_activity_level = "Very Talkative";
+    } else if (yourPercentage > 25) {
+      stats.personal_stats.your_activity_level = "Talkative";
+    } else if (yourPercentage > 15) {
+      stats.personal_stats.your_activity_level = "Moderate";
+    } else if (yourPercentage > 10) {
+      stats.personal_stats.your_activity_level = "Quiet";
+    } else {
+      stats.personal_stats.your_activity_level = "Very Quiet";
+    }
+  }
 
   if (onProgress) {
     onProgress("Processing complete!", 95);
