@@ -20,6 +20,12 @@ function PersonalCard({ data, isStoriesMode = false }) {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3);
   
+  const formatHour = (hour) => {
+    const h = hour % 12 || 12;
+    const period = hour < 12 ? 'AM' : 'PM';
+    return `${h}:00 ${period}`;
+  };
+  
   const formatTime = (minutes) => {
     if (minutes < 1) return "< 1 min";
     if (minutes < 60) return `${Math.round(minutes)} min`;
@@ -120,7 +126,7 @@ function PersonalCard({ data, isStoriesMode = false }) {
               <div className="text-slate-300 text-xs mb-1">peak hour</div>
               <div className="flex items-center gap-2 mb-0.5">
                 <div className="text-xl font-bold text-white">
-                  {personal.your_active_hour.toString().padStart(2, "0")}:00
+                  {formatHour(personal.your_active_hour)}
                 </div>
               </div>
               <div className="text-xs text-white/50">

@@ -6,6 +6,12 @@ import Row from "../Row";
 function RhythmCard({ data, isStoriesMode = false }) {
   const cardRef = useRef(null);
   const hours = Array.from({ length: 24 }, (_, i) => i);
+  
+  const formatHour = (hour) => {
+    const h = hour % 12 || 12;
+    const period = hour < 12 ? 'AM' : 'PM';
+    return `${h}:00 ${period}`;
+  };
   const fastestResponders = data.reply_times_median
     ? Object.entries(data.reply_times_median)
         .sort(([, a], [, b]) => a - b)
@@ -25,7 +31,7 @@ function RhythmCard({ data, isStoriesMode = false }) {
       ][data.busiest_dow[0][0]]
     : "—";
   const busiestHour = data.busiest_hour?.[0]
-    ? `${data.busiest_hour[0][0].toString().padStart(2, "0")}:00`
+    ? formatHour(data.busiest_hour[0][0])
     : "—";
 
   return (
