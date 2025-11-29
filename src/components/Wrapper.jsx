@@ -90,7 +90,7 @@ function Wrapper({ children, title, icon, cardRef, isStoriesMode = false }) {
             </h1>
           </div>
           <p className="text-white/80 mt-2 text-sm">
-            Instagram Rewind - 2025
+            IG Unreeled - 2025
           </p>
         </header>
         <CardContent

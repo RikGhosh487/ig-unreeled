@@ -99,7 +99,7 @@ export default function App() {
       export_info: {
         exported_at: new Date().toISOString(),
         export_version: "1.0",
-        source: "Instagram Rewind App"
+        source: "IG Unreeled App"
       }
     };
 
@@ -153,7 +153,7 @@ export default function App() {
       <div className="max-w-2xl mx-auto grid grid-cols-1 gap-6">
         <div className="text-center text-white/90 mb-2">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            Instagram Rewind {
+            IG Unreeled {
               stats.rewind_year || new Date().getFullYear()
             }
           </h2>

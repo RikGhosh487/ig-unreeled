@@ -35,7 +35,7 @@ export const processInstagramFiles = (instagramFiles, onProgress = null) => {
   // Check if we have any messages for the current year
   if (currentYearMessages.length === 0) {
     throw new Error(
-      `No messages found for ${currentYear}. This Instagram Rewind ` +
+      `No messages found for ${currentYear}. IG Unreeled ` +
       `only shows data from the current year. Your chat data appears ` +
       `to be from a different year.`
     );

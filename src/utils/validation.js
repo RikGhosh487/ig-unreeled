@@ -1,4 +1,4 @@
-// File validation utilities for Instagram Rewind
+// File validation utilities for IG Unreeled
 
 // Validate if a JSON object is a raw Instagram message file
 export const isInstagramMessageFile = (data) => {

@@ -1,4 +1,4 @@
-# Instagram Rewind Cards
+# IG Unreeled Cards
 
 **Transform your Instagram group chat data into shareable visual summaries**
 
